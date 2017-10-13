@@ -23,7 +23,6 @@ treeMethods.contains = function(target) {
     } else {
       if (child.children) {
         for (let i of child.children) {
-          console.log(i);
           findTarget(i);
         }
       }

@@ -3,22 +3,30 @@ var BinarySearchTree = function(value) {
   instance.value = value;
   instance.left = null;
   instance.right = null;
+  instance.height = 1;
   return instance;
 };
 
 var BinarySearchTreeMethods = {
   insert: function(val) {
+    var currentHeight = 1;
     var nodeLoc = function (node) {
       if (node.value > val) {
         if (node.left === null) {
+          currentHeight++;
           node.left = BinarySearchTree(val);
+          node.left.height = currentHeight;
         } else {
+          currentHeight++;
           nodeLoc(node.left);
         }
       } else if (node.value < val) {
         if (node.right === null) {
+          currentHeight++;
           node.right = BinarySearchTree(val);
+          node.right.height = currentHeight;
         } else {
+          currentHeight++;
           nodeLoc(node.right);
         }
       }
@@ -55,7 +63,26 @@ var BinarySearchTreeMethods = {
       }
     };
     applyAll(this);
+  },
+  
+  breadthFirstLog: function(cb) {
+    var queue = new Queue;
+    queue.enqueue(this);
+    var queueAndApply = function (node) {
+      node.value = cb(node.value);
+      if (node.left !== null) {
+        queue.enqueue(node.left);
+      }
+      if (node.right !== null) {
+        queue.enqueue(node.right);
+      }
+    };
+    debugger;
+    while (queue.size() > 0) {
+      queueAndApply(queue.dequeue());
+    }
   }
+  
 };
 
 

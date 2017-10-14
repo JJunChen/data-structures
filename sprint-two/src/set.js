@@ -20,7 +20,7 @@ setPrototype.remove = function(item) {
   var index = this._storage.indexOf(item);
   var deleted = this._storage.splice(index, 1);
   return deleted;
-};
+}; 
 
 /*
  * Complexity: What is the time complexity of the above functions?

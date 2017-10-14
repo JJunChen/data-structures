@@ -83,8 +83,7 @@ HashTable.prototype.remove = function(k) {
 };
 
 HashTable.prototype.rehash = function() {
-  //old storage should be cloned
-  //should set occupy back to 0;
+
   var self = this;
   var oldStorage = Object.assign({}, self._storage);
   self._storage = LimitedArray(self._limit);
@@ -100,13 +99,7 @@ HashTable.prototype.rehash = function() {
       applyAllNodes(bucket.head);
     }
   });
-  // var newHashTable = new HashTable;
-  // var callAllLinkedList = function (linkList) {
-    
-  // }
-  // for (let bucket of this._storage.storage) {
-    
-  // }
+
 };
 
 /*

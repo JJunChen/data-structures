@@ -54,4 +54,16 @@ describe('tree', function() {
     tree.removeFromParent(6);
     expect(tree.contains(6)).to.equal(false);
   });
+  
+  it('should apply callback to every value in tree', function() {
+    tree.addChild(4);
+    tree.children[0].addChild(5);
+    tree.children[0].children[0].addChild(6);
+    tree.traverse(function(val) {
+      return val + 1;
+    });
+    expect(tree.children[0].value).to.equal(5);
+    expect(tree.children[0].children[0].value).to.equal(6);
+    expect(tree.children[0].children[0].children[0].value).to.equal(7);
+  });
 });

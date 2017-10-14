@@ -47,6 +47,20 @@ treeMethods.removeFromParent = function(target) {
   findTarget(this);
 };
 
+treeMethods.traverse = function (cb) {
+  var applyAll = function(node) {
+    if (node.value !== undefined) {
+      node.value = cb(node.value);
+    }
+    if (node.children.length > 0) {
+      for (let child of node.children) {
+        applyAll(child);
+      }
+    }  
+  };
+  applyAll(this);
+};
+
 
 /*
  * Complexity: What is the time complexity of the above functions?

@@ -2,27 +2,39 @@
 
 var HashTable = function() {
   this._limit = 8;
+  this._occupied = 0;
   this._storage = LimitedArray(this._limit);
-  this._keys = [];
 };
 
 HashTable.prototype.insert = function(k, v) {
   var index = getIndexBelowMaxForKey(k, this._limit);
 
   if (!this._storage.get(index)) {
-    this._keys.push(k);
-    var linkList = new LinkedList();
-    linkList.addToTail([k, v]);
-    this._storage.set(index, linkList);
+    var doublyLinkList = new DoublyLinkedList();
+    doublyLinkList.addToTail([k, v]);
+    this._storage.set(index, doublyLinkList);
+    this._occupied++;
+    if (this._occupied > 0.75 * this._limit) {
+      this._limit *= 2;
+      this.rehash();
+    }
   } else {
-    if (this._keys.includes(k)) {
-      var bucket = this._storage.get(index);
-      bucket.addToTail([k, v]);
-      bucket.removeHead();
-    } else {
-      var bucket = this._storage.get(index);
-      bucket.addToTail([k, v]);
-      this._storage.set(index, bucket);
+    var bucket = this._storage.get(index);
+    var findTarget = function (node) {
+      if (node.value[0] === k) {
+        node.value[1] = v;
+      } else if (node.next === null) {
+        bucket.addToTail([k, v]);
+      } else {
+        findTarget(node.next);
+      }
+    };
+    findTarget(bucket.head);
+    this._storage.set(index, bucket);
+    this._occupied++;
+    if (this._occupied > 0.75 * this._limit) {
+      this._limit *= 2;
+      this.rehash();
     }
   }
 };
@@ -44,10 +56,58 @@ HashTable.prototype.retrieve = function(k) {
 
 HashTable.prototype.remove = function(k) {
   var index = getIndexBelowMaxForKey(k, this._limit);
-  this._storage.set(index);
+  var bucket = this._storage.get(index);
+  var findTarget = function (node) {
+    if (node.value[0] === k) {
+      if (node.prev !== null && node.next !== null) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+      } else if (node.prev !== null) {
+        bucket.removeHead();
+      } else if (node.next !== null) {
+        bucket.removeTail();
+      } else {
+        bucket = undefined;
+      }
+    } else {
+      findTarget(node.next);
+    }
+  };
+  findTarget(bucket.head);
+  this._storage.set(index, bucket);
+  this._occupied--;
+  if (this._occupied < 0.25 * this._limit) {
+    this._limit /= 2;
+    this.rehash();
+  }
 };
 
-
+HashTable.prototype.rehash = function() {
+  //old storage should be cloned
+  //should set occupy back to 0;
+  var self = this;
+  var oldStorage = Object.assign({}, self._storage);
+  self._storage = LimitedArray(self._limit);
+  self._occupied = 0;
+  oldStorage.each(function(bucket) {
+    var applyAllNodes = function (node) {
+      self.insert(node.value[0], node.value[1]);
+      if (node.next !== null) {
+        applyAllNodes (node.next);
+      }
+    };
+    if (bucket !== undefined) {
+      applyAllNodes(bucket.head);
+    }
+  });
+  // var newHashTable = new HashTable;
+  // var callAllLinkedList = function (linkList) {
+    
+  // }
+  // for (let bucket of this._storage.storage) {
+    
+  // }
+};
 
 /*
  * Complexity: What is the time complexity of the above functions?

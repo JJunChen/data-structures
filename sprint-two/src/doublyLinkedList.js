@@ -60,7 +60,7 @@ var DoublyLinkedList = function() {
       }
       return deleted;
     }
-  };
+  };  
   return list;
 };
 
